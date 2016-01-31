@@ -10,11 +10,22 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = puzzle
 TEMPLATE = app
-
+CONFIG += c++11
 
 SOURCES += main.cpp\
-        mainboard.cpp
+        mainboard.cpp \
+    pmodel.cpp \
+    pview.cpp \
+    settings.cpp \
+    buckets.cpp \
+    superdsu.cpp
 
-HEADERS  += mainboard.h
+HEADERS  += mainboard.h \
+    pmodel.h \
+    pview.h \
+    settings.h \
+    enums.h \
+    buckets.h \
+    superdsu.h
 
-FORMS    += mainboard.ui
+FORMS    +=
