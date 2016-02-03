@@ -8,14 +8,16 @@
 #include <QPainter>
 #include <enums.h>
 class MainBoard;
-class Settings;
+class Control;
 class ViewPart;
+
 class PView : public QObject
 {
     Q_OBJECT
 public:
-    explicit PView(Settings const* set,QObject *parent = 0);
-    ViewPart const* get_part( int id ) const;
+    explicit PView(Control* set,QObject *parent = 0);
+    void draw_part(int id, QPainter* painter);
+    void draw_shadow( int  id, QPainter* painter );
     ~PView();
 signals:
     void changed_view();
@@ -36,12 +38,17 @@ class ViewPart
 {
     friend class PView;
 public:
-    QPixmap result;
+    ViewPart(){}
+    ViewPart( const Control* inf) : info(  inf ) {}
+    QImage result;
+    QImage shadow;
     QPoint pos;
 private:
     int t;
     int d;
-    QPixmap data;
+    const Control* info;
+    QImage data;
+
     void render();
 };
 

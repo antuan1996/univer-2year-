@@ -1,8 +1,7 @@
 #include "pmodel.h"
-#include "settings.h"
 #include "pview.h"
-
-PModel::PModel(Settings const* set, QObject* parent) : QObject( parent ),my_hash( set ),  dsu( set ),  board_w( set->board_w ), board_h( set->board_h )
+#include "control.h"
+PModel::PModel(const Control *set, QObject* parent) : QObject( parent ),my_hash( set ),  dsu( set ),  board_w( set->board_w ), board_h( set->board_h )
 {
     srand( time( 0 ) );
     my_view = nullptr;
@@ -12,22 +11,29 @@ PModel::PModel(Settings const* set, QObject* parent) : QObject( parent ),my_hash
     part_w = set->puzzle_w / n_horiz;
     part_h = set->puzzle_h / set->n_vert;
     // init
-    for(size_t i = 0; i < data.size(); ++i)
-    {
-        data.at( i ).id = i;
-        data.at( i ).host = i;
-        data.at( i ).prev_id = -1;
-        int nx = rand() % (board_w - part_w);
-        int ny = rand() % (board_h - part_h);
-        data.at( i ).pos = QPoint( nx, ny);
-        my_hash.set_pos( i, data.at( i ).pos );
-        data[ i ].is_active = true;
-        data.at( i ).cross_up =  (ViewType) BORDER;
-        data.at( i ).cross_right = (ViewType) BORDER;
-        data.at( i ).cross_down = (ViewType) BORDER;
-        data.at( i ).cross_left =  (ViewType) BORDER;
+    for(int y = 0; y < set->n_vert; ++y)
+        for(int x = 0; x < set->n_horiz; ++x)
+        {
+            int i = y * set->n_horiz + x;
+            data.at( i ).id = i;
+            data.at( i ).host = i;
+            data.at( i ).prev_id = -1;
+            /*
+            int nx = rand() % (board_w - part_w);
+            int ny = rand() % (board_h - part_h);
+            */
+            int nx = part_w * x + part_w / 3 * x;
+            int ny = part_h * y + part_h / 3 * y;
 
-    }
+            data.at( i ).pos = QPoint( nx, ny);
+            my_hash.set_pos( i, data.at( i ).pos );
+            data[ i ].is_active = true;
+            data.at( i ).cross_up =  (ViewType) BORDER;
+            data.at( i ).cross_right = (ViewType) BORDER;
+            data.at( i ).cross_down = (ViewType) BORDER;
+            data.at( i ).cross_left =  (ViewType) BORDER;
+
+        }
     // crosses
     for(int y = 0; y + 1 < set->n_vert; ++y)
         for(int x = 0; x + 1 < set->n_horiz; ++x)
@@ -65,8 +71,22 @@ PModel::PModel(Settings const* set, QObject* parent) : QObject( parent ),my_hash
 }
 PModel::~PModel()
 {
-    data.clear();
+    //data.clear();
 }
+void PModel::shuffle()
+{
+    const std::vector <int> nums = dsu.draw_order();
+    for(const int& id : nums)
+    {
+        int nx = rand() % (board_w - part_w);
+        int ny = rand() % (board_h - part_h);
+        int first = dsu.get_list( id ).at( 0 );
+        QPoint diff = QPoint( nx, ny ) - data.at( first ).pos;
+        move_group( id, diff );
+    }
+    flush();
+}
+
 void PModel::set_view(PView *v)
 {
     if(my_view != nullptr)
@@ -93,12 +113,9 @@ void PModel::click_event(QPoint ev_pos)
 {
     last_pos = ev_pos;
 
-    std::list < int > buf = my_hash.get_list( ev_pos );
-    buf.splice( buf.end(), my_hash.get_list( QPoint( ev_pos.x() - part_w, ev_pos.y() ) ) );
-    buf.splice( buf.end(), my_hash.get_list( QPoint( ev_pos.x(), ev_pos.y() - part_h ) ) );
-    buf.splice( buf.end(), my_hash.get_list( QPoint( ev_pos.x() - part_w, ev_pos.y() - part_h ) ) );
+    std::list < int > buf = my_hash.get_list( QRect( ev_pos - QPoint( part_w, part_h ), ev_pos + QPoint( part_w, part_h )) );
     buf.unique();
-
+    std::cout << buf.size() << std::endl;
 
     for( int& i : buf )
     {
@@ -107,11 +124,12 @@ void PModel::click_event(QPoint ev_pos)
             && (ev_pos.x() >= it.pos.x() && ev_pos.x() <= it.pos.x() + part_w)
             && (ev_pos.y() >= it.pos.y() && ev_pos.y() <= it.pos.y() + part_h))
         {
-            if(clicked_part == -1 || dsu.size[ dsu.get_host( i ) ] < dsu.size[ clicked_part ]
-                    || ( dsu.size[ dsu.get_host( i ) ] == dsu.size[ clicked_part ]  && dsu.get_host( i ) > dsu.get_host( clicked_part ) ) )
+            if( clicked_part == -1 || dsu.get_time( clicked_part ) < dsu.get_time( i ))
                 clicked_part = dsu.get_host( i );
         }
     }
+    if( clicked_part != -1 )
+        dsu.update( clicked_part );
     flush();
 }
 void PModel::move_event(QPoint pos)
@@ -127,11 +145,12 @@ void PModel::move_event(QPoint pos)
 void PModel::release_event()
 {
     if(clicked_part == -1) return;
-    const std::list< int > part_ids = dsu.get_list( clicked_part );
+    const std::vector< int > part_ids = dsu.get_list( clicked_part );
     for( const int& i : part_ids )
     {
          check_borders( i );
     }
+    flush();
     clicked_part = -1;
 }
 void PModel::check_borders( int id )
@@ -201,11 +220,10 @@ void PModel::check_borders( int id )
             emit changed_border( down, FILLED, UP);
         }
     }
-    flush();
 }
 void PModel::move_group(int host, QPoint diff)
 {
-    const std::list< int > part_ids = dsu.get_list( host );
+    const std::vector< int > part_ids = dsu.get_list( host );
     for( const int& i : part_ids )
     {
         QPoint prev_pos = data.at( i ).pos;
@@ -219,19 +237,14 @@ void PModel::show_view(QPainter *painter)
     if( my_view != nullptr )
     {
         const std::vector <int> nums = dsu.draw_order();
-        for( int const&  id :nums )
+        for( int const&  s :nums )
         {
-            ViewPart const* data = my_view->get_part( id );
-            for( int i = 0; i < 9; ++i)
-                painter->drawPixmap( data[ i ].pos, data[ i ].result);
+            std::vector < int > parts = dsu.get_list( s );
+            if( clicked_part == dsu.get_host( s )  )
+                for( int& id : parts)
+                    my_view->draw_shadow( id, painter );
+            for( int& id : parts)
+                my_view->draw_part( id, painter ) ;
         }
-        if( clicked_part != -1)
-            for(const int& id : dsu.get_list( clicked_part ) )
-            {
-                ViewPart const* data = my_view->get_part( id );
-                for( int i = 0; i < 9; ++i)
-                    painter->drawPixmap( data[ i ].pos, data[ i ].result);
-
-            }
     }
 }

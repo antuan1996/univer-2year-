@@ -1,36 +1,41 @@
 #include "mainboard.h"
 #include "pmodel.h"
 #include "pview.h"
-#include "settings.h"
+#include "control.h"
 MainBoard::MainBoard(QWidget *parent) :
-    QWidget(parent)
+    QWidget(parent), puzzle( nullptr )
 {
     is_pressed = false;
-    setWindowState( Qt::WindowMaximized );
-    //showMaximized();
-}
-bool MainBoard::create_puzzle(Settings* set)
-{
-    info = set;
     QRect buf = QApplication::desktop()->availableGeometry();
     setGeometry(0, 0, buf.width(), buf.height());
-    set->board_w = width();
-    set->board_h = height();
 
+    ctrl = new Control( width(), height());
+    connect( ctrl, SIGNAL(data_changed(Control*)), this, SLOT(create_puzzle(Control*)) );
+    ctrl->show();
+    //showMaximized();
+}
+void MainBoard::create_puzzle(Control* set)
+{
+    delete_puzzle();
     puzzle  = new PModel(set, this);
     connect( this, SIGNAL( click_event(QPoint) ), puzzle, SLOT(click_event(QPoint)));
     connect( this, SIGNAL( move_event(QPoint) ), puzzle, SLOT(move_event(QPoint)));
     connect( this, SIGNAL( release_event() ), puzzle, SLOT(release_event()));
-
+    connect( ctrl, SIGNAL( shuffle_puzzle()), puzzle, SLOT(shuffle()) );
     view = new PView(set, this);
     puzzle->set_view( view );
-    return true;
+}
+void MainBoard::delete_puzzle()
+{
+    if(puzzle != nullptr )
+        delete puzzle;
+    puzzle = nullptr;
 }
 
 MainBoard::~MainBoard()
 {
-    delete view;
     delete puzzle;
+    delete view;
 }
 
 void MainBoard::mousePressEvent(QMouseEvent *ev)

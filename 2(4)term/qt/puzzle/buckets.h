@@ -3,16 +3,16 @@
 #include <QPoint>
 #include <list>
 #include <vector>
-
-class Settings;
+#include <QRect>
+class Control;
 
 class Buckets
 {
 public:
-    Buckets(Settings const* set);
+    Buckets(Control const* set);
     ~Buckets();
     void set_pos(int id, QPoint pos_to, QPoint pos_from = QPoint(-1, -1));
-    std::list< int > get_list( QPoint pos);
+    std::list< int > get_list(QRect rect);
 private:
     int n_horiz,n_vert;
     int part_w, part_h;

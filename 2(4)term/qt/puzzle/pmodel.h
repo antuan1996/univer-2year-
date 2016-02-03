@@ -7,13 +7,14 @@
 #include <QPoint>
 #include <stdlib.h>
 #include <time.h>
+#include <iostream>
 #include <cmath>
 
 #include <enums.h>
 #include "buckets.h"
 #include "superdsu.h"
+class Control;
 class PView;
-class Settings;
 class Buckets;
 class SuperDSU;
 struct PPart
@@ -31,7 +32,7 @@ class PModel : public QObject
     Q_OBJECT
 
 public:
-    PModel(Settings const* set, QObject* parent);
+    PModel(Control const* set , QObject* parent);
     ~PModel();
     void set_view(PView* v);
     const PView* get_view() { return my_view; }
@@ -44,6 +45,7 @@ public slots:
     void click_event(QPoint ev_pos);
     void move_event(QPoint pos);
     void release_event();
+    void shuffle();
 
 protected:
     PView* my_view;
@@ -56,8 +58,6 @@ protected:
     int clicked_part;
     QPoint last_pos;
     int board_w, board_h;
-    int dsu_get_host(int id);
-    void dsu_merge(int a, int b);
     void check_borders( int id );
     void move_group(int host , QPoint diff);
 };

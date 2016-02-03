@@ -1,23 +1,29 @@
+
 #include "pview.h"
-#include  "settings.h"
 #include "mainboard.h"
+#include "control.h"
 #define IS_CONTAIN( n, mask ) ( ((n & mask) ^ mask) == 0)
-PView::PView(Settings const* set, QObject *parent) : QObject(parent)
+PView::PView(Control* set, QObject *parent) : QObject(parent)
 {
     n_horiz = set->n_horiz * 3;
     part_w = set->puzzle_w / (set->n_horiz * 3);
     part_h = set->puzzle_h / ( n_horiz );
+
+    set->mask_horiz = set->mask_horiz.scaled( part_w * 2, part_h );
+    set->mask_vert = set->mask_vert.scaled( part_w, part_h * 2 );
+
     host_board = qobject_cast< MainBoard* >(parent); // Attention!!!
-    data.resize(set->n_horiz * set->n_vert * 9);
+    data.resize(set->n_horiz * set->n_vert * 9, ViewPart( set ));
     connect(this, SIGNAL(changed_view()), host_board, SLOT(update()));
     for(int y = 0; y < 3 * set->n_vert; ++y)
         for(int x = 0; x < n_horiz; ++x)
         {
             ViewPart& cur = data.at( y * n_horiz + x );
-            QRect window(x * part_w, y * part_h, part_w + 2, part_h + 2);
+            QRect window(x * part_w, y * part_h, part_w, part_h);
             cur.data = set->picture.copy( window );
             cur.pos = QPoint( x * part_w, y * part_h );
             cur.t = FILLED;
+            cur.d = 0;
             cur.render();
         }
     for(int y = 0; y < set->n_vert; ++y)
@@ -180,43 +186,66 @@ void PView::set_border(int id, int view_type_int, int side_int)
     data.at( ids[ side_ids[ 2 ] ] ).render();
 
 }
-ViewPart const* PView::get_part( int id ) const
+void PView::draw_part( int id, QPainter* painter)
 {
-    static ViewPart cur_data[ 9 ];
     int* ids = map_logic_to_graphic( id );
-    for(int i = 0; i < 9; ++i)
+    for( int i = 0; i < 9; ++i)
     {
-        cur_data[ i ] = data.at( ids[ i ] );
+        painter->drawImage( data[ ids[ i ] ].pos , data[ ids [ i ] ].result);
     }
-    return cur_data;
+}
+void PView::draw_shadow(  int  id, QPainter* painter)
+{
+    int* ids = map_logic_to_graphic( id );
+    for( int i = 0; i < 9; ++i)
+    {
+        painter->drawImage( data[ ids[ i ] ].pos + QPoint( 10, 10), data.at( ids[ i ] ).shadow);
+    }
 }
 
 void ViewPart::render()
 {
     // TODO Crosses
-    result = data;
-    if( t != DROP_INSIDE && t != DROP_OUTSIDE)
+    if( t == BORDER || t == FILLED )
     {
-        QPainter painter( &result );
-        QPen pen;
-        pen.setColor( Qt::white );
-        painter.setPen( pen );
-        if( IS_CONTAIN( d, UP ) )
-            painter.drawLine( 0, 0, result.width() - 1 , 0);
-        if( IS_CONTAIN( d, LEFT ) )
-            painter.drawLine( 0, 0, 0, result.height() - 1);
-        if( IS_CONTAIN( d, DOWN ) )
-            painter.drawLine( 0, result.height() - 1, result.width() - 1, result.height() - 1);
-        if( IS_CONTAIN( d, RIGHT ) )
-            painter.drawLine( result.width() - 1, 0,  result.width() - 1, result.height() - 1);
-
+        result = data;
     }
-    QBitmap mask(data.width(), data.height());
-    if(t == DROP_INSIDE)
-        mask.fill( Qt::color0 );
-    else
-        mask.fill( Qt::color1 );
-    result.setMask( mask );
+    if(t == DROP_INSIDE || t == DROP_OUTSIDE)
+    {
+        QImage content;
+
+        if( d == UP || d == DOWN )
+            content = info->mask_vert;
+        if( d == RIGHT || d == LEFT )
+            content = info->mask_horiz;
+        if( t == DROP_INSIDE && d == RIGHT  || t == DROP_OUTSIDE && d == LEFT)
+            content = info->mask_horiz.mirrored(true, false);
+        if( t == DROP_INSIDE && d == UP  || t == DROP_OUTSIDE && d == DOWN)
+            content = info->mask_vert.mirrored(false, true);
+        QPainter painter( &content );
+        if( t == DROP_INSIDE )
+        {
+            painter.setCompositionMode( QPainter::CompositionMode_SourceOut );
+        }
+         else// DROP_OUTSIDE
+        {
+            painter.setCompositionMode( QPainter::CompositionMode_SourceIn );
+        }
+        painter.drawImage(QPoint( 0, 0 ), data);
+        result = content;
+
+        //result.setMask( mask );
+    }
+    shadow = QImage(result.width(), result.height() , QImage::Format_ARGB32 );
+    shadow.fill( QColor(0, 0, 0, 120) );
+    if( t == DROP_INSIDE ||  t == DROP_OUTSIDE )
+    {
+        QPainter buffer( &shadow );
+        buffer.setCompositionMode( QPainter::CompositionMode_DestinationIn);
+        //buffer.setCompositionMode( QPainter::CompositionMode_DestinationOut);
+        buffer.drawImage( 0, 0, result );
+        buffer.end();
+    }
 }
 
 void PView::flush()

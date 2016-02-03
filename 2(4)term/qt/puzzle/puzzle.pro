@@ -16,16 +16,17 @@ SOURCES += main.cpp\
         mainboard.cpp \
     pmodel.cpp \
     pview.cpp \
-    settings.cpp \
     buckets.cpp \
-    superdsu.cpp
+    superdsu.cpp \
+    control.cpp
 
 HEADERS  += mainboard.h \
     pmodel.h \
     pview.h \
-    settings.h \
     enums.h \
     buckets.h \
-    superdsu.h
+    superdsu.h \
+    control.h
 
-FORMS    +=
+FORMS    += \
+    control.ui
