@@ -34,7 +34,6 @@ class PModel : public QObject
 public:
     PModel(Control const* set , QObject* parent);
     ~PModel();
-    void set_view(PView* v);
     const PView* get_view() { return my_view; }
     void show_view( QPainter* painter );
 signals:
@@ -42,6 +41,8 @@ signals:
     void changed_border(int id, int view_type, int side);
     void flush();
 public slots:
+    void create_view(Control* ctrl);
+    void update_view();
     void click_event(QPoint ev_pos);
     void move_event(QPoint pos);
     void release_event();

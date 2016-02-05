@@ -1,7 +1,8 @@
 #include "pmodel.h"
 #include "pview.h"
 #include "control.h"
-PModel::PModel(const Control *set, QObject* parent) : QObject( parent ),my_hash( set ),  dsu( set ),  board_w( set->board_w ), board_h( set->board_h )
+PModel::PModel(Control const* set, QObject* parent) : QObject( parent ),my_hash( set ),  dsu( set ),
+                                                        board_w( set->board_w ), board_h( set->board_h )
 {
     srand( time( 0 ) );
     my_view = nullptr;
@@ -71,6 +72,8 @@ PModel::PModel(const Control *set, QObject* parent) : QObject( parent ),my_hash(
 }
 PModel::~PModel()
 {
+    if( my_view != nullptr )
+        delete my_view;
     //data.clear();
 }
 void PModel::shuffle()
@@ -87,17 +90,18 @@ void PModel::shuffle()
     flush();
 }
 
-void PModel::set_view(PView *v)
+void PModel::create_view(Control *ctrl)
 {
     if(my_view != nullptr)
     {
         disconnect( SIGNAL( moved_part( int, QPoint)));
-        disconnect( SIGNAL( changed_border( int, ViewType, Side)));
+        disconnect( SIGNAL( changed_border( int, int, int)));
+        delete my_view;
     }
-    my_view = v;
-    connect(this, SIGNAL(moved_part(int,QPoint)), v, SLOT(set_pos(int,QPoint)));
-    connect(this, SIGNAL(changed_border(int, int, int)), v, SLOT(set_border(int, int, int)));
-    connect(this, SIGNAL(flush()), v, SLOT(flush()));
+    my_view = new PView( ctrl, parent() );
+    connect(this, SIGNAL(moved_part(int,QPoint)), my_view, SLOT(set_pos(int,QPoint)));
+    connect(this, SIGNAL(changed_border(int, int, int)), my_view, SLOT(set_border(int, int, int)));
+    connect(this, SIGNAL(flush()), my_view, SLOT(flush()));
     for( int id = 0; id < data.size(); ++id )
     {
         emit moved_part(id, data.at( id ).pos);
@@ -109,6 +113,12 @@ void PModel::set_view(PView *v)
     }
     emit flush();
 }
+void PModel::update_view()
+{
+    if( my_view != nullptr )
+        my_view->global_render();
+}
+
 void PModel::click_event(QPoint ev_pos)
 {
     last_pos = ev_pos;
@@ -243,6 +253,10 @@ void PModel::show_view(QPainter *painter)
             if( clicked_part == dsu.get_host( s )  )
                 for( int& id : parts)
                     my_view->draw_shadow( id, painter );
+            else
+                for( int& id : parts)
+                    my_view->draw_light( id, painter );
+
             for( int& id : parts)
                 my_view->draw_part( id, painter ) ;
         }

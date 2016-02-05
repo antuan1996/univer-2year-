@@ -23,7 +23,7 @@ signals:
     void move_event(QPoint pos);
     void release_event();
 public slots:
-    void create_puzzle(Control* set );
+    void create_puzzle(Control *set);
 protected :
     PModel* puzzle;
     PView* view;

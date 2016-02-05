@@ -1,14 +1,27 @@
 #include "control.h"
 #include "ui_control.h"
 
-Control::Control(int bw, int bh, QWidget *parent) :
-    QWidget(parent),mask_horiz( "cross.bmp" ), mask_vert("cross_vert.bmp") ,ui(new Ui::Control)
+Control::Control(int bw, int bh, QWidget *parent) : QDialog(parent), mask_horiz( "cross.bmp" ), mask_vert("cross_vert.bmp"),
+                                                    border_color( Qt::white ), shadow_deep( 10 ) ,ui(new Ui::Control)
 {
     board_w = bw;
     board_h = bh;
     n_horiz = 2;
     n_vert  = 2;
     ui->setupUi(this);
+    const QStringList colorNames = QColor::colorNames();
+    int index = 0;
+    int white_ind = 0;
+    for(const QString &colorName: colorNames)
+    {
+        const QColor color(colorName);
+        if( color == Qt::white )
+            white_ind = index;
+        ui->color_box->addItem(colorName, color);
+        const QModelIndex idx = ui->color_box->model()->index(index++, 0);
+        ui->color_box->model()->setData(idx, color, Qt::BackgroundColorRole);
+    }
+    ui->color_box->setCurrentIndex( white_ind );
 }
 
 Control::~Control()
@@ -21,21 +34,19 @@ void Control::scale_puzzle()
 {
     puzzle_h = data.height();
     puzzle_w = data.width();
+    if( puzzle_w  >= 2 * board_w / 3 )
+    {
+        double mn = 2.* board_w / ( 3 * puzzle_w) ;
+        puzzle_w *= mn;
+        puzzle_h *= mn;
+    }
 
-    /*
-    if( 2 * puzzle_w > board_w )
+    if( puzzle_h >= 2 * board_h / 3 )
     {
-        double mn = board_w / ( 2 * puzzle_w );
+        double mn = 2. * board_h / ( 3. * puzzle_h );
         puzzle_w *= mn;
         puzzle_h *= mn;
     }
-    if( 2 * puzzle_h > board_h )
-    {
-        double mn = board_h / ( 2 * puzzle_h );
-        puzzle_w *= mn;
-        puzzle_h *= mn;
-    }
-    */
     int div = n_horiz * 3;
         puzzle_w += div - puzzle_w % div;
     div = n_vert * 3;
@@ -96,5 +107,31 @@ void Control::on_add_buttn_clicked()
 
 void Control::on_pushButton_clicked()
 {
+    ui->finish_buttn->setEnabled( true );
     emit shuffle_puzzle();
+}
+
+void Control::on_finish_buttn_clicked()
+{
+    close();
+}
+
+void Control::on_color_box_activated(int index)
+{
+    const QModelIndex idx = ui->color_box->model()->index( index, 0);
+    QVariant data = ui->color_box->model()->data(idx, Qt::UserRole);
+    border_color = data.value < QColor >();
+    emit view_changed(  );
+}
+
+void Control::on_spinBox_valueChanged(int arg1)
+{
+    shadow_deep = arg1;
+    emit view_changed( );
+}
+
+void Control::on_horizontalSlider_valueChanged(int value)
+{
+    shadow_intensity = value;
+    emit view_changed( );
 }

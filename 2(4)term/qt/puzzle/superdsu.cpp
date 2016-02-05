@@ -42,6 +42,7 @@ void SuperDSU::merge(int a, int b)
         std::swap(a, b);
     size[ a ] += size[ b ];
     host[ b ] = a;
+    ttime[ a ] = std::max( ttime[ a ], ttime[ b ] );
     active.erase( b );
     for(const int& id : parts.at( b ))
     {

@@ -9,21 +9,21 @@ MainBoard::MainBoard(QWidget *parent) :
     QRect buf = QApplication::desktop()->availableGeometry();
     setGeometry(0, 0, buf.width(), buf.height());
 
-    ctrl = new Control( width(), height());
+    ctrl = new Control( width(), height(), this);
     connect( ctrl, SIGNAL(data_changed(Control*)), this, SLOT(create_puzzle(Control*)) );
     ctrl->show();
     //showMaximized();
 }
-void MainBoard::create_puzzle(Control* set)
+void MainBoard::create_puzzle( Control* set )
 {
     delete_puzzle();
-    puzzle  = new PModel(set, this);
+    puzzle  = new PModel( set, this);
+    puzzle->create_view( set);
     connect( this, SIGNAL( click_event(QPoint) ), puzzle, SLOT(click_event(QPoint)));
     connect( this, SIGNAL( move_event(QPoint) ), puzzle, SLOT(move_event(QPoint)));
     connect( this, SIGNAL( release_event() ), puzzle, SLOT(release_event()));
-    connect( ctrl, SIGNAL( shuffle_puzzle()), puzzle, SLOT(shuffle()) );
-    view = new PView(set, this);
-    puzzle->set_view( view );
+    connect( set, SIGNAL( shuffle_puzzle()), puzzle, SLOT(shuffle()) );
+    connect( set, SIGNAL( view_changed()), puzzle, SLOT(update_view()));
 }
 void MainBoard::delete_puzzle()
 {
@@ -34,8 +34,7 @@ void MainBoard::delete_puzzle()
 
 MainBoard::~MainBoard()
 {
-    delete puzzle;
-    delete view;
+    delete_puzzle();
 }
 
 void MainBoard::mousePressEvent(QMouseEvent *ev)
