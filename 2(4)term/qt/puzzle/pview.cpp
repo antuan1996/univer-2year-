@@ -25,7 +25,7 @@ PView::PView(Control* set, QObject *parent) : QObject(parent), info( set )
             cur.pos = QPoint( x * part_w, y * part_h );
             cur.t = FILLED;
             cur.d = 0;
-            cur.render();
+            cur.render( true, true, true );
         }
     for(int y = 0; y < set->n_vert; ++y)
         for( int x = 0; x < set->n_horiz; ++x)
@@ -96,10 +96,10 @@ PView::~PView()
 {
     data.clear();
 }
-void PView::global_render()
+void PView::global_render(bool upd_data, bool upd_shadow, bool upd_light)
 {
     for( ViewPart& cur_part : data )
-        cur_part.render();
+        cur_part.render( upd_data, upd_shadow, upd_light );
     emit changed_view();
 }
 
@@ -189,9 +189,9 @@ void PView::set_border(int id, int view_type_int, int side_int)
     }
 
     // border - default;
-    data.at( ids[ side_ids[ 0 ] ] ).render();
-    data.at( ids[ side_ids[ 1 ] ] ).render();
-    data.at( ids[ side_ids[ 2 ] ] ).render();
+    data.at( ids[ side_ids[ 0 ] ] ).render( true, true, true );
+    data.at( ids[ side_ids[ 1 ] ] ).render( true, true, true);
+    data.at( ids[ side_ids[ 2 ] ] ).render( true, true, true);
 
 }
 void PView::draw_part( int id, QPainter* painter)
@@ -220,67 +220,74 @@ void PView::draw_shadow(  int  id, QPainter* painter)
     }
 }
 
-void ViewPart::render()
+void ViewPart::render(bool upd_data, bool upd_shadow, bool upd_light )
 {
     // TODO Crosses
-    if( t == BORDER || t == FILLED )
+    if( upd_data )
     {
-        result = data;
-    }
-    if(t == DROP_INSIDE || t == DROP_OUTSIDE)
-    {
-        QImage content;
-
-        if( d == UP || d == DOWN )
-            content = host->info->mask_vert;
-        if( d == RIGHT || d == LEFT )
-            content = host->info->mask_horiz;
-        if( t == DROP_INSIDE && d == RIGHT  || t == DROP_OUTSIDE && d == LEFT)
-            content = host->info->mask_horiz.mirrored(true, false);
-        if( t == DROP_INSIDE && d == UP  || t == DROP_OUTSIDE && d == DOWN)
-            content = host->info->mask_vert.mirrored(false, true);
-        QPainter painter( &content );
-        if( t == DROP_INSIDE )
+        if( t == BORDER || t == FILLED )
         {
-            painter.setCompositionMode( QPainter::CompositionMode_SourceOut );
+            result = data;
         }
-         else// DROP_OUTSIDE
+        if(t == DROP_INSIDE || t == DROP_OUTSIDE)
         {
-            painter.setCompositionMode( QPainter::CompositionMode_SourceIn );
+            QImage content;
+
+            if( d == UP || d == DOWN )
+                content = host->info->mask_vert;
+            if( d == RIGHT || d == LEFT )
+                content = host->info->mask_horiz;
+            if( t == DROP_INSIDE && d == RIGHT  || t == DROP_OUTSIDE && d == LEFT)
+                content = host->info->mask_horiz.mirrored(true, false);
+            if( t == DROP_INSIDE && d == UP  || t == DROP_OUTSIDE && d == DOWN)
+                content = host->info->mask_vert.mirrored(false, true);
+            QPainter painter( &content );
+            if( t == DROP_INSIDE )
+            {
+                painter.setCompositionMode( QPainter::CompositionMode_SourceOut );
+            }
+             else// DROP_OUTSIDE
+            {
+                painter.setCompositionMode( QPainter::CompositionMode_SourceIn );
+            }
+            painter.drawImage(QPoint( 0, 0 ), data);
+            result = content;
+
+            //result.setMask( mask );
         }
-        painter.drawImage(QPoint( 0, 0 ), data);
-        result = content;
-
-        //result.setMask( mask );
-    }
-    shadow = QImage(result.width(), result.height() , QImage::Format_ARGB32 );
-    shadow.fill( QColor(0, 0, 0, host->info->shadow_intensity) );
-    if( t == DROP_INSIDE ||  t == DROP_OUTSIDE )
+   }
+    if( upd_shadow )
     {
-        QPainter buffer( &shadow );
-        buffer.setCompositionMode( QPainter::CompositionMode_DestinationIn);
-        //buffer.setCompositionMode( QPainter::CompositionMode_DestinationOut);
-        buffer.drawImage( 0, 0, result );
-        buffer.end();
+        shadow = QImage(result.width(), result.height() , QImage::Format_ARGB32 );
+        shadow.fill( QColor(0, 0, 0, host->info->shadow_intensity) );
+        if( t == DROP_INSIDE ||  t == DROP_OUTSIDE )
+        {
+            QPainter buffer( &shadow );
+            buffer.setCompositionMode( QPainter::CompositionMode_DestinationIn);
+            //buffer.setCompositionMode( QPainter::CompositionMode_DestinationOut);
+            buffer.drawImage( 0, 0, result );
+            buffer.end();
+        }
     }
+    if( upd_light )
+    {
 
-    QImage buf(data.width(), data.height(), QImage::Format_ARGB32 );
-    buf.fill( host->info->border_color );
-    QPainter p( &buf );
-    p.setCompositionMode( QPainter::CompositionMode_DestinationIn);
-    p.drawImage( 0, 0, result);
-    p.end();
-
-
-    light = QImage( data.width() + 2, data.height() + 2, QImage::Format_ARGB32 );
-    light.fill( QColor(255, 255, 255, 0) );
-    //QPainter b( &light);
-    p.begin( &light );
-    p.drawImage( QPoint( 0, 0), buf);
-    p.drawImage( QPoint( 2, 0), buf);
-    p.drawImage( QPoint( 2, 2), buf);
-    p.drawImage( QPoint( 0, 2), buf);
-    p.end();
+        QImage buf(data.width(), data.height(), QImage::Format_ARGB32 );
+        buf.fill( host->info->border_color );
+        QPainter p( &buf );
+        p.setCompositionMode( QPainter::CompositionMode_DestinationIn);
+        p.drawImage( 0, 0, result);
+        p.end();
+        light = QImage( data.width() + 2, data.height() + 2, QImage::Format_ARGB32 );
+        light.fill( QColor(255, 255, 255, 0) );
+        QPainter b;
+        b.begin( &light );
+        b.drawImage( QPoint( 0, 0), buf);
+        b.drawImage( QPoint( 2, 0), buf);
+        b.drawImage( QPoint( 2, 2), buf);
+        b.drawImage( QPoint( 0, 2), buf);
+        b.end();
+    }
 }
 
 void PView::flush()

@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>wood_pattern.jpg</file>
+        <file>cross.png</file>
+        <file>cross_vert.png</file>
+        <file>icon.png</file>
+    </qresource>
+</RCC>

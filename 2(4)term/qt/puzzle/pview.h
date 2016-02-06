@@ -28,7 +28,7 @@ public slots:
     void set_pos(int id, QPoint npos);
     void set_border(int id, int view_type_int, int side_int);
     void flush();
-    void global_render();
+    void global_render( bool upd_data, bool upd_shadow, bool upd_light );
 protected :
     const Control* info;
     int part_w, part_h;
@@ -53,7 +53,7 @@ private:
     int d;
     QImage data;
     PView const* host;
-    void render();
+    void render( bool upd_data,  bool upd_shadow, bool upd_light);
 };
 
 #endif // PVIEW_H

@@ -1,13 +1,16 @@
 #include "control.h"
 #include "ui_control.h"
 
-Control::Control(int bw, int bh, QWidget *parent) : QDialog(parent), mask_horiz( "cross.bmp" ), mask_vert("cross_vert.bmp"),
+Control::Control(int bw, int bh, QWidget *parent) : QDialog(parent),
                                                     border_color( Qt::white ), shadow_deep( 10 ) ,ui(new Ui::Control)
 {
+    mask_horiz.load( ":/images/cross.png" );
+    mask_vert.load(":/images/cross_vert.png");
     board_w = bw;
     board_h = bh;
     n_horiz = 2;
     n_vert  = 2;
+    shadow_intensity = 120;
     ui->setupUi(this);
     const QStringList colorNames = QColor::colorNames();
     int index = 0;
@@ -121,17 +124,17 @@ void Control::on_color_box_activated(int index)
     const QModelIndex idx = ui->color_box->model()->index( index, 0);
     QVariant data = ui->color_box->model()->data(idx, Qt::UserRole);
     border_color = data.value < QColor >();
-    emit view_changed(  );
+    emit view_changed( false, false, true );
 }
 
 void Control::on_spinBox_valueChanged(int arg1)
 {
     shadow_deep = arg1;
-    emit view_changed( );
+    emit view_changed( false, true, false );
 }
 
 void Control::on_horizontalSlider_valueChanged(int value)
 {
     shadow_intensity = value;
-    emit view_changed( );
+    emit view_changed( false, true, false );
 }

@@ -18,7 +18,8 @@ SOURCES += main.cpp\
     pview.cpp \
     buckets.cpp \
     superdsu.cpp \
-    control.cpp
+    control.cpp \
+    startwindow.cpp
 
 HEADERS  += mainboard.h \
     pmodel.h \
@@ -26,7 +27,12 @@ HEADERS  += mainboard.h \
     enums.h \
     buckets.h \
     superdsu.h \
-    control.h
+    control.h \
+    startwindow.h
 
 FORMS    += \
-    control.ui
+    control.ui \
+    startwindow.ui
+
+RESOURCES += \
+    resources_puzzle.qrc

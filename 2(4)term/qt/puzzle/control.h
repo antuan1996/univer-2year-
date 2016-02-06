@@ -42,7 +42,7 @@ private slots:
 signals:
     void shuffle_puzzle();
     void data_changed( Control* p );
-    void view_changed(  );
+    void view_changed( bool update_data, bool update_shadow, bool update_light );
 public:
     QImage data;
     QImage picture;

@@ -42,12 +42,11 @@ signals:
     void flush();
 public slots:
     void create_view(Control* ctrl);
-    void update_view();
     void click_event(QPoint ev_pos);
     void move_event(QPoint pos);
     void release_event();
-    void shuffle();
-
+    void shuffle();    
+    void update_view(bool upd_data, bool upd_shadow, bool upd_light);
 protected:
     PView* my_view;
     std::vector < PPart > data;

@@ -113,10 +113,10 @@ void PModel::create_view(Control *ctrl)
     }
     emit flush();
 }
-void PModel::update_view()
+void PModel::update_view( bool upd_data, bool upd_shadow, bool upd_light  )
 {
     if( my_view != nullptr )
-        my_view->global_render();
+        my_view->global_render( upd_data, upd_shadow, upd_light  );
 }
 
 void PModel::click_event(QPoint ev_pos)
