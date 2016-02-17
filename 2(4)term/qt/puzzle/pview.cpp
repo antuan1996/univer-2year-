@@ -9,8 +9,11 @@ PView::PView(Control* set, QObject *parent) : QObject(parent), info( set )
     part_w = set->puzzle_w / (set->n_horiz * 3);
     part_h = set->puzzle_h / ( n_horiz );
 
-    set->mask_horiz = set->mask_horiz.scaled( part_w * 2, part_h );
-    set->mask_vert = set->mask_vert.scaled( part_w, part_h * 2 );
+    //set->mask_horiz = set->mask_horiz.scaled( part_w * 2, part_h );
+    //set->mask_vert = set->mask_vert.scaled( part_w, part_h * 2 );
+
+    cross_horiz = set->mask_horiz.scaled( part_w * 2, part_h );
+    cross_vert = set->mask_vert.scaled( part_w, part_h * 2 );
 
     host_board = qobject_cast< MainBoard* >(parent); // Attention!!!
     data.resize(set->n_horiz * set->n_vert * 9, ViewPart( this ));
@@ -234,13 +237,13 @@ void ViewPart::render(bool upd_data, bool upd_shadow, bool upd_light )
             QImage content;
 
             if( d == UP || d == DOWN )
-                content = host->info->mask_vert;
+                content = host->cross_vert;
             if( d == RIGHT || d == LEFT )
-                content = host->info->mask_horiz;
+                content = host->cross_horiz;
             if( t == DROP_INSIDE && d == RIGHT  || t == DROP_OUTSIDE && d == LEFT)
-                content = host->info->mask_horiz.mirrored(true, false);
+                content = host->cross_horiz.mirrored(true, false);
             if( t == DROP_INSIDE && d == UP  || t == DROP_OUTSIDE && d == DOWN)
-                content = host->info->mask_vert.mirrored(false, true);
+                content = host->cross_vert.mirrored(false, true);
             QPainter painter( &content );
             if( t == DROP_INSIDE )
             {

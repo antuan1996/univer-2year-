@@ -16,10 +16,11 @@ class MainBoard : public QWidget
 
 public:
     explicit MainBoard(QWidget *parent = 0);
-    void show_control();
     void delete_puzzle();
 
     ~MainBoard();
+    void load_puzzle();
+    void show_settings();
 signals:
     void click_event(QPoint pos);
     void move_event(QPoint pos);

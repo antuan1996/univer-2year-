@@ -39,6 +39,10 @@ private slots:
 
     void on_horizontalSlider_valueChanged(int value);
 
+    void preview_change(const QString & path);
+
+    void on_tabWidget_currentChanged(int index);
+
 signals:
     void shuffle_puzzle();
     void data_changed( Control* p );
@@ -50,6 +54,7 @@ public:
     QImage mask_horiz;
     QImage mask_vert;
     QColor border_color;
+    QString img_name;
     int shadow_deep;
     int shadow_intensity;
 
@@ -62,6 +67,7 @@ public:
     Ui::Control *ui;
 
     void scale_puzzle();
+    void load_image();
 };
 
 #endif // CONTROL_H

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>283</width>
-    <height>216</height>
+    <width>285</width>
+    <height>400</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,26 +23,26 @@
       <enum>Qt::ClickFocus</enum>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <property name="enabled">
        <bool>true</bool>
       </property>
       <attribute name="title">
-       <string>Image</string>
+       <string>Пазл</string>
       </attribute>
       <widget class="QLabel" name="label_3">
        <property name="geometry">
         <rect>
          <x>10</x>
          <y>20</y>
-         <width>181</width>
+         <width>231</width>
          <height>17</height>
         </rect>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Step 1&lt;/span&gt;: Choose image file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Шаг 1&lt;/span&gt;: Выберите изображение&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
       <widget class="QPushButton" name="pushButton_2">
@@ -55,7 +55,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Open...</string>
+        <string>Открыть...</string>
        </property>
       </widget>
       <widget class="QPushButton" name="load_buttn">
@@ -71,48 +71,76 @@
         </rect>
        </property>
        <property name="text">
-        <string>Next</string>
+        <string>Далее</string>
        </property>
       </widget>
-      <widget class="QWidget" name="layoutWidget">
+      <widget class="QLabel" name="preview_pict">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>40</y>
+         <x>30</x>
+         <y>170</y>
          <width>211</width>
-         <height>42</height>
+         <height>161</height>
         </rect>
        </property>
-       <layout class="QFormLayout" name="formLayout">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>Image:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="image_name">
-          <property name="text">
-           <string>None</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>Status:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLabel" name="imagests_lbl">
-          <property name="text">
-           <string>N/A</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <property name="text">
+        <string>Предпросмотр</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="imagests_lbl">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>60</y>
+         <width>26</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>N/A</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_5">
+       <property name="geometry">
+        <rect>
+         <x>11</x>
+         <y>41</y>
+         <width>79</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Имя файла</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="image_name">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>40</y>
+         <width>37</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>None</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_6">
+       <property name="geometry">
+        <rect>
+         <x>11</x>
+         <y>64</y>
+         <width>46</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Статус</string>
+       </property>
       </widget>
      </widget>
      <widget class="QWidget" name="tab_2">
@@ -120,13 +148,13 @@
        <bool>false</bool>
       </property>
       <attribute name="title">
-       <string>Level</string>
+       <string>Сложность</string>
       </attribute>
       <widget class="QSlider" name="lvl_slider">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>40</y>
+         <y>60</y>
          <width>201</width>
          <height>34</height>
         </rect>
@@ -150,14 +178,14 @@
       <widget class="QLabel" name="label">
        <property name="geometry">
         <rect>
-         <x>9</x>
-         <y>9</y>
-         <width>176</width>
-         <height>17</height>
+         <x>10</x>
+         <y>10</y>
+         <width>281</width>
+         <height>51</height>
         </rect>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Step 2:  &lt;/span&gt;Set difficulty level&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Шаг 2: &lt;/span&gt;Настроить уровень&lt;/p&gt;&lt;p&gt; сложности&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
       <widget class="QPushButton" name="nextlvl_buttn">
@@ -170,7 +198,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Next</string>
+        <string>Далее</string>
        </property>
       </widget>
      </widget>
@@ -179,19 +207,19 @@
        <bool>false</bool>
       </property>
       <attribute name="title">
-       <string>Additional</string>
+       <string>Дополнительное</string>
       </attribute>
       <widget class="QPushButton" name="add_buttn">
        <property name="geometry">
         <rect>
-         <x>170</x>
+         <x>160</x>
          <y>130</y>
          <width>85</width>
          <height>27</height>
         </rect>
        </property>
        <property name="text">
-        <string>Next</string>
+        <string>Далее</string>
        </property>
       </widget>
       <widget class="QComboBox" name="color_box">
@@ -214,7 +242,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Border color:</string>
+        <string>Цвет границ</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_7">
@@ -222,18 +250,18 @@
         <rect>
          <x>10</x>
          <y>30</y>
-         <width>131</width>
+         <width>141</width>
          <height>41</height>
         </rect>
        </property>
        <property name="text">
-        <string>Shadow deepness:</string>
+        <string>Глубина тени</string>
        </property>
       </widget>
       <widget class="QSpinBox" name="spinBox">
        <property name="geometry">
         <rect>
-         <x>170</x>
+         <x>180</x>
          <y>40</y>
          <width>51</width>
          <height>31</height>
@@ -259,20 +287,20 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>60</y>
-         <width>131</width>
+         <y>70</y>
+         <width>161</width>
          <height>41</height>
         </rect>
        </property>
        <property name="text">
-        <string>Shadow intensity:</string>
+        <string>Интенсивность тени</string>
        </property>
       </widget>
       <widget class="QSlider" name="horizontalSlider">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>90</y>
+         <y>100</y>
          <width>241</width>
          <height>29</height>
         </rect>
@@ -302,19 +330,19 @@
        <bool>false</bool>
       </property>
       <attribute name="title">
-       <string>Finish</string>
+       <string>Финиш</string>
       </attribute>
       <widget class="QPushButton" name="pushButton">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>50</y>
+         <y>80</y>
          <width>101</width>
          <height>27</height>
         </rect>
        </property>
        <property name="text">
-        <string>Shuffle</string>
+        <string>Перемешать</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_4">
@@ -322,12 +350,12 @@
         <rect>
          <x>10</x>
          <y>10</y>
-         <width>201</width>
-         <height>41</height>
+         <width>191</width>
+         <height>51</height>
         </rect>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Step 4&lt;/span&gt;: Shuffle and just do it&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Шаг 4&lt;/span&gt;: Перемешать &lt;/p&gt;&lt;p&gt;и начать собирать пазл&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
       <widget class="QPushButton" name="finish_buttn">
@@ -336,14 +364,14 @@
        </property>
        <property name="geometry">
         <rect>
-         <x>160</x>
+         <x>114</x>
          <y>130</y>
-         <width>85</width>
+         <width>131</width>
          <height>27</height>
         </rect>
        </property>
        <property name="text">
-        <string>Finish</string>
+        <string>Начать сборку</string>
        </property>
       </widget>
      </widget>

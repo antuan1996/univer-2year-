@@ -33,6 +33,9 @@ protected :
     const Control* info;
     int part_w, part_h;
     int n_horiz;
+    QImage cross_vert;
+    QImage cross_horiz;
+
     MainBoard const* host_board;
     std::vector < ViewPart > data;
     int* map_logic_to_graphic(int id) const;

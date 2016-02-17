@@ -2,6 +2,8 @@
 #include "pmodel.h"
 #include "pview.h"
 #include "control.h"
+#include "previewfiledialog.h"
+
 MainBoard::MainBoard(QWidget *parent) :
     QWidget(parent), puzzle( nullptr )
 {
@@ -12,14 +14,27 @@ MainBoard::MainBoard(QWidget *parent) :
 
     ctrl = new Control( width(), height(), this);
     connect( ctrl, SIGNAL(data_changed(Control*)), this, SLOT(create_puzzle(Control*)) );
-    ctrl->show();
+    //ctrl->show();
     //showMaximized();
 }
 
-void MainBoard::show_control()
+void MainBoard::load_puzzle()
+{
+    QFileDialog* dialog = new PreviewFileDialog(this, "Open image", "", tr("Image Files (*.png *.jpg *.bmp *.tif);;"));
+    dialog->setAcceptMode(QFileDialog::AcceptOpen);
+    connect( dialog, SIGNAL(currentChanged(QString)), ctrl, SLOT(preview_change(QString)) );
+    dialog->exec();
+    QString filename = dialog->selectedFiles().at( 0 );
+    ctrl->img_name = filename;
+    ctrl->load_image();
+    show_settings();
+}
+void MainBoard::show_settings()
 {
     ctrl->show();
 }
+
+
 void MainBoard::create_puzzle( Control* set )
 {
     delete_puzzle();

@@ -24,5 +24,15 @@ StartWindow::~StartWindow()
 
 void StartWindow::on_actionPuzzles_triggered()
 {
-    ui->centralwidget->show_control();
+    ui->centralwidget->load_puzzle();
+}
+
+void StartWindow::on_action_triggered()
+{
+    ui->centralwidget->show_settings();
+}
+
+void StartWindow::on_action_2_triggered()
+{
+    close();
 }

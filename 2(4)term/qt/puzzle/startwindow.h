@@ -18,6 +18,10 @@ public:
 private slots:
     void on_actionPuzzles_triggered();
 
+    void on_action_triggered();
+
+    void on_action_2_triggered();
+
 private:
     Ui::StartWindow *ui;
 };

@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     buckets.cpp \
     superdsu.cpp \
     control.cpp \
-    startwindow.cpp
+    startwindow.cpp \
+    previewfiledialog.cpp
 
 HEADERS  += mainboard.h \
     pmodel.h \
@@ -28,7 +29,8 @@ HEADERS  += mainboard.h \
     buckets.h \
     superdsu.h \
     control.h \
-    startwindow.h
+    startwindow.h \
+    previewfiledialog.h
 
 FORMS    += \
     control.ui \
