@@ -86,6 +86,12 @@ void Control::load_image()
 
 }
 
+void Control::closeEvent(QCloseEvent *event)
+{
+    emit closed();
+    event->accept();
+}
+
 void Control::on_pushButton_2_clicked()
 {
     QFileDialog* dialog = new PreviewFileDialog(this, "Open image", "", tr("Image Files (*.png *.jpg *.bmp *.tif);;"));

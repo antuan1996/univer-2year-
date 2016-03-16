@@ -25,8 +25,12 @@ signals:
     void click_event(QPoint pos);
     void move_event(QPoint pos);
     void release_event();
+    void status_changed( QString str );
 public slots:
     void create_puzzle(Control *set);
+    void puzzle_finished(  );
+    void settings_changed( bool a, bool b, bool c);
+    void puzzle_start();
 protected :
     PModel* puzzle;
     PView* view;

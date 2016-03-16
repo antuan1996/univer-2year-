@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     superdsu.cpp \
     control.cpp \
     startwindow.cpp \
-    previewfiledialog.cpp
+    previewfiledialog.cpp \
+    about.cpp
 
 HEADERS  += mainboard.h \
     pmodel.h \
@@ -30,11 +31,14 @@ HEADERS  += mainboard.h \
     superdsu.h \
     control.h \
     startwindow.h \
-    previewfiledialog.h
+    previewfiledialog.h \
+    about.h
 
 FORMS    += \
     control.ui \
-    startwindow.ui
+    startwindow.ui \
+    about.ui \
+    mainwindow.ui
 
 RESOURCES += \
     resources_puzzle.qrc

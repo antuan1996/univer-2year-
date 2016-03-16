@@ -15,6 +15,7 @@ SuperDSU::SuperDSU(const Control *info)
         parts.at( i ).insert( i );
     }
 }
+
 int SuperDSU::get_host(int id)
 {
     if(host[ id ] == id) return id;
@@ -32,11 +33,11 @@ int SuperDSU::get_time(int id)
     return ttime[ id ];
 }
 
-void SuperDSU::merge(int a, int b)
+bool SuperDSU::merge(int a, int b)
 {
     a = get_host( a );
     b = get_host( b );
-    if( a == b ) return;
+    if( a == b ) return false;
     // merge b in a
     if( size[ a ] < size[ b ] )
         std::swap(a, b);
@@ -49,6 +50,9 @@ void SuperDSU::merge(int a, int b)
         parts.at( a ).insert( id );
     }
     parts.at( b ).clear();
+    if( parts.at( a ).size() >= host.size() )
+        return true;
+    return false;
 }
 const std::vector< int > SuperDSU::get_list(int id)
 {

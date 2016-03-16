@@ -2,6 +2,7 @@
 #define PMODEL_H
 
 #include <QObject>
+#include <QMessageBox>
 #include <QPainter>
 #include <vector>
 #include <QPoint>
@@ -40,6 +41,7 @@ signals:
     void moved_part(int id, QPoint delt);
     void changed_border(int id, int view_type, int side);
     void flush();
+    void puzzle_finsihed();
 public slots:
     void create_view(Control* ctrl);
     void click_event(QPoint ev_pos);

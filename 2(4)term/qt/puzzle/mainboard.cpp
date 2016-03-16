@@ -14,13 +14,15 @@ MainBoard::MainBoard(QWidget *parent) :
 
     ctrl = new Control( width(), height(), this);
     connect( ctrl, SIGNAL(data_changed(Control*)), this, SLOT(create_puzzle(Control*)) );
-    //ctrl->show();
+    connect( ctrl, SIGNAL(closed()), this, SLOT(puzzle_start()) );
+    //connect( ctrl, SIGNAL(data_changed(Control*)), this, SLOT(create_puzzle(Control*)) );
+    ctrl->show();
     //showMaximized();
 }
 
 void MainBoard::load_puzzle()
 {
-    QFileDialog* dialog = new PreviewFileDialog(this, "Open image", "", tr("Image Files (*.png *.jpg *.bmp *.tif);;"));
+    QFileDialog* dialog = new PreviewFileDialog(this, "Выберете изображение", "", tr("Image Files (*.png *.jpg *.bmp *.tif);;"));
     dialog->setAcceptMode(QFileDialog::AcceptOpen);
     connect( dialog, SIGNAL(currentChanged(QString)), ctrl, SLOT(preview_change(QString)) );
     dialog->exec();
@@ -45,7 +47,28 @@ void MainBoard::create_puzzle( Control* set )
     connect( this, SIGNAL( release_event() ), puzzle, SLOT(release_event()));
     connect( set, SIGNAL( shuffle_puzzle()), puzzle, SLOT(shuffle()) );
     connect( set, SIGNAL( view_changed(bool,bool,bool)), puzzle, SLOT(update_view(bool,bool,bool)));
+
+    connect( set, SIGNAL( view_changed(bool,bool,bool)), this, SLOT(settings_changed(bool,bool,bool)));
+    connect( set, SIGNAL( shuffle_puzzle()), this, SLOT(puzzle_start()) );
+    connect( puzzle, SIGNAL(puzzle_finsihed()), this, SLOT(puzzle_finished()));
+    emit status_changed( "Настройка пазла" );
 }
+void MainBoard::puzzle_finished()
+{
+    int but = QMessageBox::information( this, "Поздравления", "Поздравляем, вы собрали пазл!!!") ;
+    emit status_changed( "ПОБЕДА! Вы собрали пазл" );
+}
+
+void MainBoard::settings_changed(bool a, bool b, bool c)
+{
+    emit status_changed( "Настройка пазла" );
+}
+
+void MainBoard::puzzle_start()
+{
+    emit status_changed( "Для победы, соберите пазл так быстро, насколько возможно" );
+}
+
 void MainBoard::delete_puzzle()
 {
     if(puzzle != nullptr )

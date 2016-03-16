@@ -116,6 +116,7 @@
     <property name="title">
      <string>О программе</string>
     </property>
+    <addaction name="action_3"/>
    </widget>
    <addaction name="menuView"/>
    <addaction name="menuAbout"/>
@@ -134,6 +135,11 @@
   <action name="action_2">
    <property name="text">
     <string>Выход</string>
+   </property>
+  </action>
+  <action name="action_3">
+   <property name="text">
+    <string>Автор</string>
    </property>
   </action>
  </widget>

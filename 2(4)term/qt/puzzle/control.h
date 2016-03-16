@@ -5,6 +5,7 @@
 #include <QString>
 #include <QFileDialog>
 #include <QDialog>
+#include <QCloseEvent>
 #include <QColor>
 namespace Ui {
 class Control;
@@ -45,6 +46,7 @@ private slots:
 
 signals:
     void shuffle_puzzle();
+    void closed();
     void data_changed( Control* p );
     void view_changed( bool update_data, bool update_shadow, bool update_light );
 public:
@@ -68,6 +70,8 @@ public:
 
     void scale_puzzle();
     void load_image();
+protected :
+     void closeEvent(QCloseEvent *event);
 };
 
 #endif // CONTROL_H

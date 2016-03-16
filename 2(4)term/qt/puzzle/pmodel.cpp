@@ -125,7 +125,7 @@ void PModel::click_event(QPoint ev_pos)
 
     std::list < int > buf = my_hash.get_list( QRect( ev_pos - QPoint( part_w, part_h ), ev_pos + QPoint( part_w, part_h )) );
     buf.unique();
-    std::cout << buf.size() << std::endl;
+    //std::cout << buf.size() << std::endl;
 
     for( int& i : buf )
     {
@@ -175,12 +175,18 @@ void PModel::check_borders( int id )
         int left = id - 1;
         QPoint delt = data.at( id ).pos - data.at( left ).pos;
         delt.rx() -= part_w;
-        if( hypot( delt.x(), delt.y() )  <= eps )
+        if( hypot( delt.x(), delt.y() )  <= eps && data.at( id ).cross_left != FILLED )
         {
             npos = QPoint( data.at( left ).pos.x() + part_w, data.at( left ).pos.y());
             move_group( host, npos - data.at( id ).pos );
-            dsu.merge(left, id);
+
+            if( dsu.merge(left, id))
+                emit puzzle_finsihed();
+
             host = dsu.get_host( id );
+            data.at( id ).cross_left = ( ViewType )FILLED;
+            data.at( left ).cross_right = ( ViewType )FILLED;
+
             emit changed_border(id, FILLED, LEFT);
             emit changed_border(left, FILLED, RIGHT);
         }
@@ -191,12 +197,18 @@ void PModel::check_borders( int id )
         int right = id + 1;
         QPoint delt = data.at( right ).pos - data.at( id ).pos;
         delt.rx() -= part_w;
-        if( hypot( delt.x(), delt.y() )  <= eps)
+        if( hypot( delt.x(), delt.y() )  <= eps  && data.at( id ).cross_right != FILLED  )
         {
             npos = QPoint( data.at( right ).pos.x() - part_w, data.at( right ).pos.y());
             move_group( host, npos - data.at( id ).pos );
-            dsu.merge(right, id);
+
+            if( dsu.merge(right, id) )
+                emit puzzle_finsihed();
             host = dsu.get_host( id );
+
+            data.at( id ).cross_right= ( ViewType )FILLED;
+            data.at( right ).cross_left = ( ViewType )FILLED;
+
             emit changed_border( id, FILLED, RIGHT);
             emit changed_border( right, FILLED, LEFT);
         }
@@ -206,26 +218,42 @@ void PModel::check_borders( int id )
         int up = id - n_horiz;
         QPoint delt = data.at( id ).pos - data.at( up ).pos;
         delt.ry() -= part_h;
-        if( hypot( delt.x(), delt.y() )  <= eps )
+        if( hypot( delt.x(), delt.y() )  <= eps && data.at( id ).cross_up != FILLED )
         {
             npos = QPoint( data.at( up ).pos.x(), data.at( up ).pos.y() + part_h);
             move_group( host, npos - data.at( id ).pos );
-            dsu.merge(up, id);
+
+            if( dsu.merge(up, id) )
+            {
+                emit puzzle_finsihed();
+            }
             host = dsu.get_host( id );
+
+            host = dsu.get_host( id );
+            data.at( id ).cross_up = ( ViewType )FILLED;
+            data.at( up ).cross_down = ( ViewType )FILLED;
+
+
             emit changed_border( id, FILLED, UP);
             emit changed_border( up, FILLED, DOWN);
         }
     }
     if( y + 1 < data.size() / n_horiz )
     {
-            int down = id + n_horiz;
+        int down = id + n_horiz;
         QPoint delt = data.at( down ).pos - data.at( id ).pos;
         delt.ry() -= part_h;
-        if( hypot( delt.x(), delt.y() )  <= eps)
+        if( hypot( delt.x(), delt.y() )  <= eps && data.at( id ).cross_down != FILLED )
         {
             npos = QPoint( data.at( down ).pos.x(), data.at( down ).pos.y() - part_h);
             move_group( host, npos - data.at( id ).pos );
-            dsu.merge(down, id);
+
+            if( dsu.merge(down, id) )
+                emit puzzle_finsihed();
+
+            data.at( id ).cross_left = ( ViewType )FILLED;
+            data.at( down ).cross_right = ( ViewType )FILLED;
+
             emit changed_border( id, FILLED, DOWN);
             emit changed_border( down, FILLED, UP);
         }
